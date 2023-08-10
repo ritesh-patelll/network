@@ -1,0 +1,18 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <div>
+        <div>
+            <!-- Create a form for user to post a message -->
+            <form action="{% url 'index' %}" method="post">
+                <!-- This token is for Cross Site Request Forgery protection -->
+                {% csrf_token %}
+                <!-- Text area for user input -->
+                <textarea name="content" placeholder="What's on your mind?" required></textarea>
+                <!-- Button to submit the form -->
+                <input type="submit" value="Post">
+            </form>
+        </div>
+        <div></div>
+    </div>
+{% endblock %}

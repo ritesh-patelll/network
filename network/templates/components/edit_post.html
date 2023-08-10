@@ -1,0 +1,64 @@
+<button class="edit-btn" data-post-id="{{ post.id }}">Edit</button>
+
+{% include 'components/csrf.html' %}
+
+<script type="text/javascript">
+    // Query all elements with 'edit-btn' class and store in 'editButtons' 
+    const editButtons = document.querySelectorAll('.edit-btn');
+
+    // Loop through each element in 'editButtons' array
+    editButtons.forEach((button, i) => {
+
+        // Add Event Listener to each 'edit-btn'. On button click:
+        button.addEventListener('click', () => {
+          
+            // Get current content of the post 
+            let postContent = document.getElementById(`post-content-${i}`).innerText;
+          
+            // Check if the button text is 'Edit' 
+            if (button.innerText === "Edit") {
+            
+                // Set button text to 'Save'
+                button.innerText = "Save";
+          
+                // Replace post content with a textarea element containing current post content
+                document.getElementById(`post-content-${i}`).innerHTML = 
+                `<textarea id="edit-textarea-${i}">${postContent}</textarea>`;
+            } else {
+                // If button text is not 'Edit', then it's currently on 'Save'
+                
+                // Get updated content from the textarea
+                let updatedContent = document.querySelector(`#edit-textarea-${i}`).value;
+          
+                // Make API request to server to update post content
+                // Using HTTP PUT method to update existing resources
+                fetch(`/edit_post/${button.dataset.postId}`, {
+                  method: 'PUT',
+                  headers: {
+                    // include CSRF token in the request header
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                  },
+                  // Convert JavaScript object into a JSON string to send to server
+                  body: JSON.stringify({
+                    content: updatedContent
+                  })
+                })
+                // Parse the JSON response into a JavaScript object
+                .then(response => response.json())
+                .then(result => {
+                  // Logging the result for debugging purposes
+                  console.log(result);
+                });
+          
+                // After saving changes, reset button text back to 'Edit'
+                button.innerText = "Edit";
+                
+                // Replace the textarea with a p element displaying the updated post content
+                document.getElementById(`post-content-${i}`).innerHTML = 
+                `<p id="post-content-${i}">${updatedContent}</p>`;
+            }
+        });
+    });
+</script>

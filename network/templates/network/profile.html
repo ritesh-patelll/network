@@ -1,0 +1,67 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+
+    <!-- Display the user's Username, Followers and Following counts -->
+    <h2>{{ user.username }}</h2>
+    <p>Following: {{ following_count }}</p>
+    <p>Followers: {{ followers_count }}</p>
+
+    <!-- Follow / Unfollow button: 
+        Only appear to authenticated users.
+        Will not appear if the user is viewing their own profile.-->
+    {% if request.user.is_authenticated %}
+        {% if request.user.username != user_profile.username %}
+            <button id="follow-button">{% if is_following %}Unfollow{% else %}Follow{% endif %}</button>
+        {% endif %}
+    {% endif %}
+
+    <!-- Posts section where each post with its content and timestamp are displayed -->
+    {% for post in page_obj %}
+        <div class="post" data-post-id="{{ post.id }}">
+            <p id="post-content-{{ forloop.counter0 }}">{{ post.content }}</p>
+            {% include 'components/edit_post.html' %}<!-- If true, include the edit_post component -->
+            <p>{{ post.timestamp }}</p>
+            {% include 'components/like_unlike.html' %}<!-- Inclusion of like/unlike component for each post -->
+        </div>
+    {% endfor %}
+
+    <!-- Pagination allows to navigate across different pages -->
+    <div class="pagination">
+        <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+    
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+    
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+        {% endif %}
+        </span>
+    </div>
+
+    <!-- JavaScript to manage the follow/unfollow functionality -->
+    <script type="text/javascript">
+
+        document.querySelector('#follow-button').addEventListener('click', function () {
+            // send a POST request to the server
+            fetch('/follow/' + username, {
+            method: 'POST'
+            })
+            .then(response => response.json())
+            .then(result => {
+            // change the button text based on whether user is now following or unfollowing
+            const followButton = document.querySelector('#follow-button');
+            if (result.following) {
+                followButton.textContent = 'Unfollow';
+            } else {
+                followButton.textContent = 'Follow';
+            }
+            })
+        });
+
+    </script>
+{% endblock %}

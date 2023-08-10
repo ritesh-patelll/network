@@ -1,0 +1,43 @@
+<button class="like-button" data-post-id="{{ post.id }}">
+    <!-- Check if the current user has liked the post -->
+    {% if request.user in post.likes.all %}
+        Unlike
+    {% else %}
+        Like
+    {% endif %}
+</button>
+<!-- Display the count of likes for the post -->
+<p class="like-count" data-post-id="{{ post.id }}">{{ post.likes.count }} Likes</p>
+
+<!-- Include csrf token for security -->
+{% include 'components/csrf.html' %}
+
+<script type="text/javascript">
+    // Get all buttons with class 'like-button'
+    document.querySelectorAll('.like-button').forEach(btn => {
+        // Add click event listener to each like-button
+        btn.addEventListener('click', async event => {
+            // Get the post ID from the button's dataset
+            const postID = event.currentTarget.dataset.postId;
+      
+            // Send a POST request to the /like_post/{postID} route
+            const response = await fetch(`/like_post/${postID}`, {
+                method: 'POST',
+                // Set headers for the request
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            });
+            
+            // Get the result from the response as JSON
+            const result = await response.json();
+            // Update button text based on the current text
+            const buttonText = event.target.innerText === 'Like' ? 'Unlike' : 'Like';
+            event.target.innerText = buttonText;
+            // Update the like count text
+            document.querySelector(`.like-count[data-post-id="${postID}"]`).innerText = `${result.likes_count} Likes`;
+        });
+    });
+</script>

@@ -1,0 +1,37 @@
+<script type="text/javascript">
+
+    /**
+     * This function retrieves the value of a particular cookie based on the provided name.
+     * 
+     * @param {string} name - The name of the cookie to be retrieved
+     * @returns {string} - Returns the value of the cookie, or null if the cookie does not exist
+     */
+    function getCookie(name) {
+
+        let cookieValue = null; // instantiate the variable where the cookie value will be stored
+
+        // Check if the document has any cookies and that it's not an empty string
+        if (document.cookie && document.cookie !== '') {
+
+            // Split the document's cookies string into an array, where each element is a single cookie.
+            const cookies = document.cookie.split(';');
+            
+            // Iterate through each cookie
+            for (let i = 0; i < cookies.length; i++) {
+
+                // Remove any leading or trailing white space from the cookie string
+                const cookie = cookies[i].trim();
+
+                // Checks if the cookie's name matches our provided name
+                // If a match, we decode the value (as it may contain encoded characters) and we break our loop
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+
+        // Return the cookie value; null if it doesn't exist
+        return cookieValue;
+    }
+</script>

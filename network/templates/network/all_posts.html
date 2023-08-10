@@ -1,0 +1,40 @@
+{% extends "network/layout.html" %}<!-- This line extends from the base layout having all basic elements like header, footer, sidebar etc.-->
+
+{% block body %}<!-- This is a section in a layout where specific content will be placed-->
+
+    {% for post in page_obj %}<!-- Start of loop to display each post in the page_obj -->
+
+        <div class="post" data-post-id="{{ post.id }}"><!-- Single post container -->
+            <p>{{ post.user }}</p><!-- Display the user who posted-->
+            <p id="post-content-{{ forloop.counter0 }}">{{ post.content }}</p><!-- Display the content of the post -->
+            {% if request.user == post.user %}<!-- Checking if the logged-in user is the same user who posted-->
+                {% include 'components/edit_post.html' %}<!-- If true, include the edit_post component -->
+            {% endif %}
+            <p>{{ post.timestamp }}</p><!-- Display the timestamp of the post -->
+
+            {% include 'components/like_unlike.html' %}<!-- Inclusion of like/unlike component for each post -->
+        
+        </div> <!-- End of Single post container -->
+
+    {% endfor %}<!-- End of loop to display each post in the page_obj -->
+
+
+    <!-- Div for Next/previous page buttons -->
+    
+    <div class="pagination"><!-- Container for pagination -->
+        <span class="step-links"><!-- Container for navigation buttons -->
+            {% if page_obj.has_previous %}<!-- Checking if there are any previous pages -->
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a><!-- If true, display 'previous' as a link to the previous page -->
+            {% endif %}
+        
+            <span class="current"><!-- Container to display the current page number -->
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.<!-- Displaying the current page number and the total number of pages -->
+            </span>
+        
+            {% if page_obj.has_next %}<!-- Checking if there are any next pages -->
+            <a href="?page={{ page_obj.next_page_number }}">next</a><!-- If true, display 'next' as a link to the next page-->
+            {% endif %}
+        </span><!--End of Container for navigation buttons -->
+    </div><!-- End of Container for pagination -->
+
+{% endblock %}<!-- End of the body section-->
